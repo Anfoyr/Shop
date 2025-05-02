@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link href="style.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+    <div id="osn">
+        <img id="imgs" title="Перейти на главную страницу предприятия" src="https://www.kznamya.ru/static/global/img/logo-intro.svg" alt="Логотип">
+        <h1>Красное знамя</h1>
+        <h3 id="timer"></h3>
+    </div>
+
+    <!-- <button id="news">Наши новости</button> -->
+
+    <fieldset id="field" style="width: 200px; margin: 0 auto;">
+        <legend id="win_auth">Вход</legend>
+        <div class="all">
+            <label for="email">Email</label><br>
+            <input id="email" type="email" required><br>
+            <label for="password">Пароль</label><br>
+            <input id="password" type="password" required><br>
+            <a href="http://localhost:3000/authorization">Зарегистрироваться!</a>
+        </div>        
+        <button id="sn">Войти</button>
+    </fieldset>
+    
+    <button id="news">Наши новости</button>
+    <br>
+    <hr>
+
+    <h3 style="margin-left: 40px;">Этапы становления и развития завода</h3>
+
+    <ul>
+        <li><b>1918 г.</b> – создание Государственного Древообделочного завода (выпуск продукции для нужд народного хозяйства).</li>            
+        <li><b>1963 г.</b> – переименование организации п/я №141 в завод «Красное знамя».</li>
+        <li><b>1965 г.</b> – Приказом Министерства Радиопромышленности СССР завод реорганизуется. В результате образуются два самостоятельных производства: Завод «Красное знамя», ориентированный на выпуск радиоэлектронной техники, и Рязанский государственный приборный завод.</li>
+        <li>
+            <b>1973 г.</b> – образование производственного объединения «Красное знамя» в составе:
+            <ul>
+                <li>завод «Красное знамя» (головное предприятие);</li>
+                <li>РКБ «Глобус» (на самостоятельном балансе).</li>
+            </ul>
+        </li>
+        <li><b>1982 г.</b> – РКБ «Глобус» выходит из производственного объединения «Красное знамя».</li>
+        <li>
+            <b>1983 г.</b> – изменения в структуре производственного объединения «Красное знамя». В состав входят:
+            <ul>
+                <li>завод «Красное знамя» – головное предприятие;</li>
+                <li>телепроизводство;</li>
+                <li>ОКБ (на отдельном балансе).</li>
+            </ul>
+        </li>
+        <li><b>1994 г.</b> – преобразование ПО «Красное знамя» в АООТ завод «Красное знамя».</li>
+        <li><b>1994 г.</b> – завод «Красное знамя» получает статус Открытого акционерного общества завод «Красное знамя»</li>
+        <li><b>2015 г.</b> – завод «Красное знамя» получил новое фирменное наименование – Публичное акционерное общество завод «Красное знамя».</li>
+    </ul>
+
+    <p><b>Наше расположение:  </b><ins>390043, Россия, г. Рязань, проезд Шабулина, 2 а.</ins></p>
+    <address>
+        <p>
+            <a href="mailto:post@kznamya.ru">post@kznamya.ru</a>
+            <p>Телефон: +7 (4912) 938-555</p>
+        </p>
+    </address>
+    <p style="text-align: end;">© ПАО завод «Красное знамя», 2019-2023</p>
+
+
+    <script>
+        document.getElementById('news').addEventListener('click', function(){
+            window.location.href = 'https://www.kznamya.ru/news'
+        })
+
+        document.getElementById('imgs').addEventListener('click', function(){
+            window.location.href = 'https://www.kznamya.ru'
+        })
+
+        let count = 1
+
+        document.getElementById('sn').addEventListener('click', function () {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const timer  = document.getElementById('timer')
+            const sn = document.getElementById('sn')
+
+            function countDown(num, error) {
+                let time = null;
+
+                if(error >3){update()}
+
+                    function update() {
+                        if (num >= 0) {
+                            timer.innerHTML = 'Повторная попытка через: ' + num;
+                            timer.style.color = 'Red'
+                            console.log(num);
+                            num--;
+                            time = setTimeout(update, 1000);
+                            sn.disabled = true
+                            sn.title = 'Попробуйте позже'
+                        } else {             
+                            clearTimeout(time);
+                            timer.innerHTML = ''
+                            sn.disabled = false
+                        }
+                }
+            }
+
+            if (!email || !password) {
+                alert('Пожалуйста, заполните все поля.');
+                return;
+            }
+
+            // Подготовка данных для отправки
+            const data = {
+                email: email,
+                password: password
+            };
+
+            fetch('http://localhost:3000/entrance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                    body: JSON.stringify(data)
+                })
+
+                .then(response => {
+                    if (!response.ok) {
+                        // Если ответ не OK, проверяем тип ответа
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('text/html')) {
+                            return response.text().then(html => {
+                                throw new Error('Сервер вернул HTML: ' + html);
+                            });
+                        } else {
+                            return response.json().then(err => {
+                                throw new Error(err.message || 'Ошибка сети');
+                            });
+                        }
+                    }
+                    return response.json();
+                })
+
+                .then(data => {
+                    console.log('Успешно', data);
+                    window.location.href = `http://localhost:3000/user/${data.user.email}`;
+                })
+
+                .catch(error => {
+                    console.error('Произошла ошибка:', error);
+                    if(error.message === 'Неверный пароль'){    
+                        count %20 === 0 ? count=0 : count++
+                        console.log(count)
+                        countDown(15*(count), count)                        
+                    }
+                    alert('Ошибка: ' + error.message);
+                });
+            });
+    </script>
+    <script src= "code.js"></script>
+</body>
+</html>
