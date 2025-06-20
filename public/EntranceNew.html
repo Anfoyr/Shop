@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Сброс пароля</title>
+    <link href="style.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+
+    <fieldset id="field" style="width: 300px; margin: 0 auto; text-align: center; line-height: 1.7em;">
+        <legend>Сброс пароля</legend>
+        <div class="all">
+            <label for="password">Новый пароль</label><br>
+            <input id="password" type="password" required><br>
+            <label for="confirmPassword">Подтвердите пароль</label><br>
+            <input id="confirmPassword" type="password" required><br>
+        </div>        
+        <button id="sn" style="background-color: yellow;">Сбросить пароль</button>
+    </fieldset>
+
+    <script>
+        const token = window.location.pathname.split('/')[2];
+        
+        document.getElementById('sn').addEventListener('click', async () => {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert('Пароли не совпадают');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/reset-password/${token}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    window.location.href = '/entrance';
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при сбросе пароля');
+            }
+        });
+    </script>
+</body>
+</html>

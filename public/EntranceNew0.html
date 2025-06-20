@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Восстановление пароля</title>
+    <link href="style.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+    <div id="osn">
+        <img id="imgs" src="https://www.kznamya.ru/static/global/img/logo-intro.svg" alt="Логотип">
+        <h1>Красное знамя</h1>
+    </div>
+
+    <fieldset id="field" style="width: 300px; margin: 0 auto;">
+        <legend>Восстановление пароля</legend>
+        <div class="all">
+            <label for="email">Введите ваш email</label><br>
+            <input id="email" type="email" required><br>
+        </div>        
+        <button id="sn">Отправить инструкции</button>
+    </fieldset>
+
+    <script>
+        document.getElementById('sn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+
+            try {
+                const response = await fetch('/forgot-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    window.location.href = '/entrance';
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при отправке запроса');
+            }
+        });
+    </script>
+</body>
+</html>
